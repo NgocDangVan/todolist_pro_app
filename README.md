@@ -2,15 +2,4 @@
 
 A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Ứng dụng được phát triển theo thiết kế giao diện tại : https://www.figma.com/design/Rsa6nyZ2jGRhOFRqKITmG0/UpTodo---Todo-list-app-UI-Kit-(Community)?node-id=2-12503&t=wRs89iaSkkEn80O3-0 
