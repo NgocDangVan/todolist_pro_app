@@ -1,6 +1,7 @@
 // Class cha: Quản lý các page con và di chuyển qua lại giữa các page con
 import 'package:flutter/material.dart';
 import 'package:todo_list_app/ui/ultils/enums/onboarding_page_position.dart';
+import 'package:todo_list_app/ui/welcome/welcome_page.dart';
 
 import 'onboarding_child_page.dart';
 
@@ -29,7 +30,7 @@ class _OnboardingPageViewState extends State<OnboardingPageView> {
             },
             backOnPressed: () {},
             skipOnPressed: () {
-              print("Đi đến màn hình welcome");
+              _goToWelcomePage();
             },
           ),
           OnboardingChildPage(
@@ -41,23 +42,28 @@ class _OnboardingPageViewState extends State<OnboardingPageView> {
               _pageController.jumpToPage(0);
             },
             skipOnPressed: () {
-              print("Đi đến màn hình welcome");
+              _goToWelcomePage();
             },
           ),
           OnboardingChildPage(
             onboardingPagePosition: OnboardingPagePosition.page3,
             nextOnPressed: () {
-              print("Đi đến màn hình welcome");
+              _goToWelcomePage();
             },
             backOnPressed: () {
               _pageController.jumpToPage(1);
             },
             skipOnPressed: () {
-              print("Đi đến màn hình welcome");
+              _goToWelcomePage();
             },
           ),
         ],
       ),
     );
+  }
+
+  void _goToWelcomePage() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => WelcomePage()));
   }
 }
