@@ -6,3 +6,4 @@ A new Flutter project.
 
 Thư viện sử dụng trong dự án:
 - shared_preferences: ^2.2.3 : Lưu cờ vào bộ nhớ shared_preferences đối với android, dùng để xử lý logic Onboarding trong dự án
+- easy_localization: ^3.0.7 : Xử lý đa ngôn ngữ

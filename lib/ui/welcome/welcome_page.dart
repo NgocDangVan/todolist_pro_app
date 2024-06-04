@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -27,6 +28,7 @@ class WelcomePage extends StatelessWidget {
         children: [
           _buildTitleAndDesc(),
           const Spacer(),
+          _buildButtonChangeLanguage(context),
           _buildButtonLogin(),
           _buildButtonRegister(),
         ],
@@ -43,7 +45,7 @@ class WelcomePage extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "Welcome to UpTodo",
+              "welcome_title".tr(),
               style: TextStyle(
                   color: Colors.white.withOpacity(0.87),
                   fontFamily: "Lato",
@@ -56,7 +58,7 @@ class WelcomePage extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "Please login to your account or create new account to continue",
+              "welcome_description".tr(),
               style: TextStyle(
                   color: Colors.white.withOpacity(0.67),
                   fontFamily: "Lato",
@@ -67,6 +69,34 @@ class WelcomePage extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildButtonChangeLanguage(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 48,
+      padding: EdgeInsets.symmetric(horizontal: 24),
+      margin: EdgeInsets.only(bottom: 20),
+      child: ElevatedButton(
+          onPressed: () {
+            //Lấy ra locale hiện tại
+            final currentLocale = context.locale.toString();
+            if (currentLocale == 'en') {
+              context.setLocale(Locale("vn"));
+            } else {
+              context.setLocale(Locale("en"));
+            }
+          },
+          style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8875FF),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4))),
+          child: Text(
+            "Đổi ngôn ngữ",
+            style: const TextStyle(
+                fontSize: 16, fontFamily: "Lato", color: Colors.white),
+          )),
     );
   }
 
