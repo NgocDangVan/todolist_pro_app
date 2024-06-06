@@ -10,5 +10,9 @@
   "Create_category_form_category_background_color_label": "Category color :",
   "Create_category_form_category_icon_text_color_label": "Category icon & text color :",
   "Create_category_form_category_preview": "Category preview :",
-  "Create_category_create_button": "Create Category"
+  "Create_category_create_button": "Create Category",
+  "Create_task_name_label" : "Add Task",
+  "Create_task_name_place" : "Enter task name here",
+  "Create_task_desc_label" : "Description",
+  "Create_task_desc_place" : "Enter task description here"
 }

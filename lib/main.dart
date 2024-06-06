@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
       supportedLocales: context.supportedLocales,
-      home: CreateOrEditCategory(),
+      home: MainPage(),
     );
   }
 }
