@@ -7,9 +7,9 @@ part of 'category_realm_entity.dart';
 // **************************************************************************
 
 // ignore_for_file: type=lint
-class _CategoryRealmEntity extends $_CategoryRealmEntity
+class CategoryRealmEntity extends _CategoryRealmEntity
     with RealmEntity, RealmObjectBase, RealmObject {
-  _CategoryRealmEntity(
+  CategoryRealmEntity(
     ObjectId id,
     String name, {
     int? iconCodePoint,
@@ -23,7 +23,7 @@ class _CategoryRealmEntity extends $_CategoryRealmEntity
     RealmObjectBase.set(this, 'iconColorHex', iconColorHex);
   }
 
-  _CategoryRealmEntity._();
+  CategoryRealmEntity._();
 
   @override
   ObjectId get id => RealmObjectBase.get<ObjectId>(this, 'id') as ObjectId;
@@ -57,19 +57,54 @@ class _CategoryRealmEntity extends $_CategoryRealmEntity
       RealmObjectBase.set(this, 'iconColorHex', value);
 
   @override
-  Stream<RealmObjectChanges<_CategoryRealmEntity>> get changes =>
-      RealmObjectBase.getChanges<_CategoryRealmEntity>(this);
+  Stream<RealmObjectChanges<CategoryRealmEntity>> get changes =>
+      RealmObjectBase.getChanges<CategoryRealmEntity>(this);
 
   @override
-  _CategoryRealmEntity freeze() =>
-      RealmObjectBase.freezeObject<_CategoryRealmEntity>(this);
+  Stream<RealmObjectChanges<CategoryRealmEntity>> changesFor(
+          [List<String>? keyPaths]) =>
+      RealmObjectBase.getChangesFor<CategoryRealmEntity>(this, keyPaths);
 
-  static SchemaObject get schema => _schema ??= _initSchema();
-  static SchemaObject? _schema;
-  static SchemaObject _initSchema() {
-    RealmObjectBase.registerFactory(_CategoryRealmEntity._);
-    return const SchemaObject(
-        ObjectType.realmObject, _CategoryRealmEntity, '_CategoryRealmEntity', [
+  @override
+  CategoryRealmEntity freeze() =>
+      RealmObjectBase.freezeObject<CategoryRealmEntity>(this);
+
+  EJsonValue toEJson() {
+    return <String, dynamic>{
+      'id': id.toEJson(),
+      'name': name.toEJson(),
+      'iconCodePoint': iconCodePoint.toEJson(),
+      'backgroundColorHex': backgroundColorHex.toEJson(),
+      'iconColorHex': iconColorHex.toEJson(),
+    };
+  }
+
+  static EJsonValue _toEJson(CategoryRealmEntity value) => value.toEJson();
+  static CategoryRealmEntity _fromEJson(EJsonValue ejson) {
+    return switch (ejson) {
+      {
+        'id': EJsonValue id,
+        'name': EJsonValue name,
+        'iconCodePoint': EJsonValue iconCodePoint,
+        'backgroundColorHex': EJsonValue backgroundColorHex,
+        'iconColorHex': EJsonValue iconColorHex,
+      } =>
+        CategoryRealmEntity(
+          fromEJson(id),
+          fromEJson(name),
+          iconCodePoint: fromEJson(iconCodePoint),
+          backgroundColorHex: fromEJson(backgroundColorHex),
+          iconColorHex: fromEJson(iconColorHex),
+        ),
+      _ => raiseInvalidEJson(ejson),
+    };
+  }
+
+  static final schema = () {
+    RealmObjectBase.registerFactory(CategoryRealmEntity._);
+    register(_toEJson, _fromEJson);
+    return SchemaObject(
+        ObjectType.realmObject, CategoryRealmEntity, 'CategoryRealmEntity', [
       SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('iconCodePoint', RealmPropertyType.int, optional: true),
@@ -77,5 +112,8 @@ class _CategoryRealmEntity extends $_CategoryRealmEntity
           optional: true),
       SchemaProperty('iconColorHex', RealmPropertyType.string, optional: true),
     ]);
-  }
+  }();
+
+  @override
+  SchemaObject get objectSchema => RealmObjectBase.getSchema(this) ?? schema;
 }

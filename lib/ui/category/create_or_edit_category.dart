@@ -2,7 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
-import 'package:todo_list_app/app/icon_notifier.dart';
+import 'package:realm/realm.dart';
+import 'package:todo_list_app/entities/category_realm_entity.dart';
+import 'package:todo_list_app/ui/ultils/color_extension.dart';
 
 class CreateOrEditCategory extends StatefulWidget {
   const CreateOrEditCategory({super.key});
@@ -14,7 +16,7 @@ class CreateOrEditCategory extends StatefulWidget {
 class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
   final _nameCategoryTextController = TextEditingController();
   final List<Color> _colorDataSource = [];
-  Color colorSelected = Colors.white;
+  Color colorSelected = const Color(0xFF0069A3);
   Color _iconColorSelected = Colors.white;
   IconData? _iconSelected;
   @override
@@ -96,6 +98,9 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
                       borderRadius: BorderRadius.circular(4),
                       borderSide:
                           BorderSide(width: 1, color: Color(0xFF979797)))),
+              onChanged: (String? value) {
+                setState(() {});
+              },
             ),
           )
         ],
@@ -245,9 +250,47 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
     );
   }
 
-  void _onHandlerCreateCategory() {
-    final categoryName = _nameCategoryTextController.text;
-    print(categoryName);
+  void _onHandlerCreateCategory() async {
+    try {
+      final categoryName = _nameCategoryTextController.text;
+      if (categoryName.isEmpty) {
+        _showAlert("Validation", "Category name is required");
+        return;
+      }
+
+      if (_iconColorSelected == null) {
+        _showAlert("Validation", "Category Icon is required");
+        return;
+      }
+
+      //Mở Realm để chuẩn bị lưu dữ liệu
+      var config = Configuration.local([CategoryRealmEntity.schema]);
+      var realm = Realm(config);
+
+      final backgroundColorHex = colorSelected.toHex();
+      var category = CategoryRealmEntity(ObjectId(), categoryName,
+          iconCodePoint: _iconSelected?.codePoint,
+          backgroundColorHex: backgroundColorHex,
+          iconColorHex: _iconColorSelected.toHex());
+      await realm.writeAsync(() {
+        realm.add(category);
+      });
+
+      var categories = realm.all<CategoryRealmEntity>();
+      print(
+          "My category is: ${categories[0].name} model: ${categories[0].backgroundColorHex}");
+
+      _nameCategoryTextController.text = "";
+      colorSelected = const Color(0xFF0069A3);
+      _iconColorSelected = Colors.white;
+      _iconSelected = null;
+      setState(() {});
+      //show alert lên người dùng
+      _showAlert("Successfully", "Create Category success");
+    } catch (e) {
+      print(e);
+      _showAlert("Failed", "Create Category failed");
+    }
   }
 
   void _chooseIcon() async {
@@ -296,10 +339,12 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
             content: SingleChildScrollView(
               child: MaterialPicker(
                 pickerColor: colorSelected,
+                enableLabel: true,
                 onColorChanged: (Color newColor) {
                   setState(() {
                     colorSelected = newColor;
                   });
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -320,6 +365,7 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
                     setState(() {
                       _iconColorSelected = newColor;
                     });
+                    Navigator.pop(context);
                   }),
             ),
           );
@@ -379,12 +425,31 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
               ),
               Text(
                 _nameCategoryTextController.text,
-                style: TextStyle(fontSize: 14, color: _iconColorSelected),
+                style: const TextStyle(fontSize: 14, color: Colors.white),
               )
             ],
           ),
         ],
       ),
     );
+  }
+
+  void _showAlert(String title, String message) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("OK"))
+            ],
+          );
+        });
   }
 }

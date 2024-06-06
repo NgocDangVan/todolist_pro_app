@@ -1,9 +1,9 @@
 import 'package:realm/realm.dart';
 
-part 'category_realm_entity.g.dart';
+part 'category_realm_entity.realm.dart';
 
 @RealmModel()
-class $_CategoryRealmEntity {
+class _CategoryRealmEntity {
   @PrimaryKey()
   late ObjectId id;
   late String name;

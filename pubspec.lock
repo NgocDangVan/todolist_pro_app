@@ -281,6 +281,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.2"
+  ejson:
+    dependency: transitive
+    description:
+      name: ejson
+      sha256: f336c6fb6c5c97db8ae59ba8ed207f542241f1db39cf2ef03776d308de3432ff
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
+  ejson_annotation:
+    dependency: transitive
+    description:
+      name: ejson_annotation
+      sha256: b265eea722ee340d77d1c36a55a1f963d517a0dabb569b0775664c319a4e3ebf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   equatable:
     dependency: transitive
     description:
@@ -745,34 +761,34 @@ packages:
     dependency: "direct main"
     description:
       name: realm
-      sha256: a53b6903e2f6603c906bf5aac3691f0b2f45262aa08525a4bd546900602f2f17
+      sha256: "053b7a7adf3533cc9f507529d6b9ff948bc0270060dd58c502a9029413fcd2d6"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "2.3.0"
   realm_common:
     dependency: transitive
     description:
       name: realm_common
-      sha256: "29516a9e43a9e75b2e16226ce24ccd9a549d9377e69be218394d8fb84da11183"
+      sha256: "1f36a224f35fd089691b631c0c9c92af274e00d524258203a937706d7d5e9d0c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "2.3.0"
   realm_dart:
     dependency: transitive
     description:
       name: realm_dart
-      sha256: "55cf02d26b0775e79570cf0ba6e4036a10c66250b99cb8f1ee41d71057206a7f"
+      sha256: ce2bd5dfb5eee142998fc7f395df34e349e1c179b78582d6d84bb4003c556c81
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "2.3.0"
   realm_generator:
     dependency: transitive
     description:
       name: realm_generator
-      sha256: "6d26ca214aad1b49f37a1a86f3216f19a25657d38d82cefb16551a35aa316ec1"
+      sha256: "183257f345ac5b01b424261dd6e3c400d414bec725d33d390b5b6942274f5a80"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.0"
+    version: "2.3.0"
   sane_uuid:
     dependency: transitive
     description:
@@ -986,6 +1002,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  type_plus:
+    dependency: transitive
+    description:
+      name: type_plus
+      sha256: d5d1019471f0d38b91603adb9b5fd4ce7ab903c879d2fbf1a3f80a630a03fcc9
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   typed_data:
     dependency: transitive
     description:
