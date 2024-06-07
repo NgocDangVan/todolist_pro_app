@@ -7,7 +7,8 @@ import 'package:todo_list_app/entities/category_realm_entity.dart';
 import 'package:todo_list_app/ui/ultils/color_extension.dart';
 
 class CreateOrEditCategory extends StatefulWidget {
-  const CreateOrEditCategory({super.key});
+  final String? categoryId;
+  const CreateOrEditCategory({super.key, this.categoryId});
 
   @override
   State<CreateOrEditCategory> createState() => _CreateOrEditCategoryState();
@@ -19,21 +20,31 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
   Color colorSelected = const Color(0xFF0069A3);
   Color _iconColorSelected = Colors.white;
   IconData? _iconSelected;
+
+  bool get isEdit {
+    return widget.categoryId != null;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    _colorDataSource.addAll([
-      Color(0xFFC9CC41),
-      Color(0xFF66CC41),
-      Color(0xFF41CCA7),
-      Color(0xFF4181CC),
-      Color(0xFF41A2CC),
-      Color(0xFFCC8441),
-      Color(0xFF9741CC),
-      Color(0xFFCC4173),
-    ]);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (isEdit) {
+        _findCategory(widget.categoryId!);
+      }
+    });
+    // _colorDataSource.addAll([
+    //   Color(0xFFC9CC41),
+    //   Color(0xFF66CC41),
+    //   Color(0xFF41CCA7),
+    //   Color(0xFF4181CC),
+    //   Color(0xFF41A2CC),
+    //   Color(0xFFCC8441),
+    //   Color(0xFF9741CC),
+    //   Color(0xFFCC4173),
+    // ]);
   }
 
   @override
@@ -43,7 +54,10 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         centerTitle: false,
-        title: const Text("Create_category_page_title",
+        title: Text(
+                isEdit
+                    ? "Category_list_edit_category_button"
+                    : "Create_category_page_title",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -234,15 +248,21 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
           const Spacer(),
           ElevatedButton(
               onPressed: () {
-                _onHandlerCreateCategory();
+                if (isEdit) {
+                  _editCategory();
+                } else {
+                  _onHandlerCreateCategory();
+                }
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8875FF),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4))),
-              child: const Text(
-                "Create_category_create_button",
-                style: TextStyle(
+              child: Text(
+                isEdit
+                    ? "Edit_category_create_button"
+                    : "Create_category_create_button",
+                style: const TextStyle(
                     fontSize: 16, fontFamily: "Lato", color: Colors.white),
               ).tr())
         ],
@@ -287,6 +307,9 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
       setState(() {});
       //show alert lên người dùng
       _showAlert("Successfully", "Create Category success");
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       print(e);
       _showAlert("Failed", "Create Category failed");
@@ -353,7 +376,7 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
   }
 
   void _onChooseCategoryIconTextColor() async {
-    showDialog(
+    await showDialog(
         context: context,
         builder: (context) {
           // Cách 1
@@ -434,8 +457,8 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
     );
   }
 
-  void _showAlert(String title, String message) {
-    showDialog(
+  Future _showAlert(String title, String message) async {
+    await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -451,5 +474,75 @@ class _CreateOrEditCategoryState extends State<CreateOrEditCategory> {
             ],
           );
         });
+  }
+
+  void _findCategory(String id) {
+    final config = Configuration.local([CategoryRealmEntity.schema]);
+    final realm = Realm(config);
+
+    final category =
+        realm.find<CategoryRealmEntity>(ObjectId.fromHexString(id));
+    if (category == null) {
+      return;
+    }
+
+    _nameCategoryTextController.text = category.name;
+    if (category.iconCodePoint != null) {
+      _iconSelected =
+          IconData(category.iconCodePoint!, fontFamily: "MaterialIcons");
+    }
+    if (category.backgroundColorHex != null) {
+      colorSelected = HexColor(category.backgroundColorHex!);
+    }
+
+    if (category.iconColorHex != null) {
+      _iconColorSelected = HexColor(category.iconColorHex!);
+    }
+    setState(() {});
+  }
+
+  Future<void> _editCategory() async {
+    try {
+      final categoryName = _nameCategoryTextController.text;
+      if (categoryName.isEmpty) {
+        _showAlert("Validation", "Category name is required");
+        return;
+      }
+
+      if (_iconColorSelected == null) {
+        _showAlert("Validation", "Category Icon is required");
+        return;
+      }
+
+      //Mở Realm để chuẩn bị lưu dữ liệu
+      var config = Configuration.local([CategoryRealmEntity.schema]);
+      var realm = Realm(config);
+
+      final category = realm.find<CategoryRealmEntity>(
+          ObjectId.fromHexString(widget.categoryId!));
+      if (category == null) {
+        return;
+      }
+
+      await realm.writeAsync(() {
+        category.name = categoryName;
+        category.iconCodePoint = _iconSelected?.codePoint;
+        category.iconColorHex = _iconColorSelected?.toHex();
+        category.backgroundColorHex = colorSelected?.toHex();
+      });
+      _nameCategoryTextController.text = "";
+      colorSelected = const Color(0xFF0069A3);
+      _iconColorSelected = Colors.white;
+      _iconSelected = null;
+      setState(() {});
+      //show alert lên người dùng
+      await _showAlert("Successfully", "Edit Category success");
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      print(e);
+      _showAlert("Failed", "Edit Category failed");
+    }
   }
 }

@@ -1,5 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_list_app/models/category_model.dart';
+import 'package:todo_list_app/ui/category/category_list_page.dart';
+import 'package:todo_list_app/ui/ultils/color_extension.dart';
 
 class CreateTaskPage extends StatefulWidget {
   const CreateTaskPage({super.key});
@@ -11,6 +15,7 @@ class CreateTaskPage extends StatefulWidget {
 class _CreateTaskPageState extends State<CreateTaskPage> {
   final _nameTaskTextController = TextEditingController();
   final _descTaskTextController = TextEditingController();
+  CategoryModel? _categorySelected;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,7 +38,8 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
       children: [
         _buildTaskNameField(),
         _buildTaskDescField(),
-        _buildTaskActionField()
+        if (_categorySelected != null) _buildTaskCategory(),
+        _buildTaskActionField(),
       ],
     ));
   }
@@ -108,6 +114,64 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
     );
   }
 
+  Widget _buildTaskCategory() {
+    return Container(
+      margin: EdgeInsets.only(top: 15),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Task category",
+                  style: TextStyle(fontSize: 18, color: Color(0xFFAFAFAF)))
+              .tr(),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: _buildGridCategoryItem(_categorySelected!),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridCategoryItem(CategoryModel category) {
+    return GestureDetector(
+      onTap: () {},
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: category.backgroundColorHex != null
+                  ? HexColor(category.backgroundColorHex!)
+                  : Colors.white,
+            ),
+            // vì icon lưu vào cơ sở dữ liệu dưới dạng codepoint, nên cần hàm IconData để chuyển đổi
+            child: category.iconCodePoint != null
+                ? Icon(
+                    IconData(category.iconCodePoint!,
+                        fontFamily: "MaterialIcons"),
+                    color: category.iconColorHex != null
+                        ? HexColor(category.iconColorHex!)
+                        : Colors.white,
+                    size: 30)
+                : null,
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 5),
+            child: Text(
+              category.name,
+              style: const TextStyle(fontSize: 14, color: Colors.white),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildTaskActionField() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -128,7 +192,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showDialogChooseCategory();
+                },
                 icon: Image.asset(
                   "assets/images/tag.png",
                   width: 24,
@@ -160,5 +226,35 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         ),
       ],
     );
+  }
+
+  void _showDialogChooseCategory() async {
+    final result = await showGeneralDialog(
+        context: context,
+        // _,__,___ : là hàm có 3 tham số nhưng không truyền tham số nào cả
+        pageBuilder: (_, __, ___) {
+          return CategoryListPage();
+        });
+
+    if (result != null && result is Map<String, dynamic>) {
+      final categoryId = result["categoryId"];
+      if (categoryId == null) {
+        return null;
+      }
+      final name = result["name"];
+      final iconCodePoint = result["iconCodePoint"];
+      final backgroundColorHex = result["backgroundColorHex"];
+      final iconColorHex = result["iconColorHex"];
+
+      final categoryModel = CategoryModel(
+          id: categoryId,
+          name: name,
+          iconCodePoint: iconCodePoint,
+          backgroundColorHex: backgroundColorHex,
+          iconColorHex: iconColorHex);
+      setState(() {
+        _categorySelected = categoryModel;
+      });
+    } else {}
   }
 }
