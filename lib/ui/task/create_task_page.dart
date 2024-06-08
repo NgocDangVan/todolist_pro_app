@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_app/models/category_model.dart';
 import 'package:todo_list_app/ui/category/category_list_page.dart';
+import 'package:todo_list_app/ui/task_priority/task_priority_list_page.dart';
 import 'package:todo_list_app/ui/ultils/color_extension.dart';
 
 class CreateTaskPage extends StatefulWidget {
@@ -16,6 +17,8 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
   final _nameTaskTextController = TextEditingController();
   final _descTaskTextController = TextEditingController();
   CategoryModel? _categorySelected;
+  DateTime? _taskDateTimeSelected;
+  int? _taskPrioritySelected;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,7 +41,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
       children: [
         _buildTaskNameField(),
         _buildTaskDescField(),
+        if (_taskDateTimeSelected != null) _buildTaskDateTime(),
         if (_categorySelected != null) _buildTaskCategory(),
+        if (_taskPrioritySelected != null) _buildTaskPriority(),
         _buildTaskActionField(),
       ],
     ));
@@ -117,16 +122,79 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
   Widget _buildTaskCategory() {
     return Container(
       margin: EdgeInsets.only(top: 15),
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("Task category",
+          Text("Task category: ",
                   style: TextStyle(fontSize: 18, color: Color(0xFFAFAFAF)))
               .tr(),
           Container(
             margin: EdgeInsets.only(top: 10),
             child: _buildGridCategoryItem(_categorySelected!),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskPriority() {
+    return Container(
+      margin: EdgeInsets.only(top: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text("Task priority: ",
+                  style: TextStyle(fontSize: 18, color: Color(0xFFAFAFAF)))
+              .tr(),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: const Color(0xFF8687E7)),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/images/flag.png",
+                    width: 24,
+                    height: 24,
+                    fit: BoxFit.fill,
+                  ),
+                  Text(_taskPrioritySelected.toString(),
+                          style: const TextStyle(
+                              fontSize: 18, color: Color(0xFFAFAFAF)))
+                      .tr()
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskDateTime() {
+    return Container(
+      margin: EdgeInsets.only(top: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text("Task time: ",
+                  style: TextStyle(fontSize: 18, color: Color(0xFFAFAFAF)))
+              .tr(),
+          Container(
+            margin: EdgeInsets.only(left: 10),
+            child: Text(
+                    DateFormat("dd-MM-yyyy HH:mm")
+                        .format(_taskDateTimeSelected!),
+                    style:
+                        const TextStyle(fontSize: 18, color: Color(0xFFAFAFAF)))
+                .tr(),
           )
         ],
       ),
@@ -183,7 +251,9 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  _selectTaskTime();
+                },
                 icon: Image.asset(
                   "assets/images/timer.png",
                   width: 24,
@@ -203,7 +273,7 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: _showDialogChoosePriority,
                 icon: Image.asset(
                   "assets/images/flag.png",
                   width: 24,
@@ -226,6 +296,22 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         ),
       ],
     );
+  }
+
+  void _showDialogChoosePriority() async {
+    final result = await showGeneralDialog(
+        context: context,
+        // _,__,___ : là hàm có 3 tham số nhưng không truyền tham số nào cả
+        pageBuilder: (_, __, ___) {
+          return const TaskPriorityListPage();
+        });
+
+    if (result != null && result is Map<String, dynamic>) {
+      final priority = result["priority"];
+      setState(() {
+        _taskPrioritySelected = priority;
+      });
+    } else {}
   }
 
   void _showDialogChooseCategory() async {
@@ -256,5 +342,48 @@ class _CreateTaskPageState extends State<CreateTaskPage> {
         _categorySelected = categoryModel;
       });
     } else {}
+  }
+
+  void _selectTaskTime() async {
+    final date = await showDatePicker(
+        context: context,
+        firstDate: DateTime.now(),
+        lastDate: DateTime.now().add(const Duration(days: 365)),
+        //Thay đổi giao diện màu mè hơn
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                  colorScheme: const ColorScheme.dark(
+                      primary: Color(0xFF8687E7), onSurface: Colors.white)),
+              child: child!);
+        });
+    if (date == null) {
+      return;
+    }
+
+    if (!context.mounted) {
+      return;
+    }
+
+    final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                  colorScheme: const ColorScheme.dark(
+                      primary: Color(0xFF8687E7), onSurface: Colors.white)),
+              child: child!);
+        });
+
+    if (time == null) {
+      return;
+    }
+
+    final dateTimeSelected =
+        date.copyWith(hour: time.hour, minute: time.minute, second: 0);
+    setState(() {
+      _taskDateTimeSelected = dateTimeSelected;
+    });
   }
 }

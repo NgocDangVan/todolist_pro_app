@@ -10,3 +10,4 @@ Thư viện sử dụng trong dự án:
 - realm: ^2.3.0 : Lưu database ở local
 - flutter_iconpicker: ^3.4.5 : Quản lý chọn icon
 - flutter_colorpicker: ^1.1.0 : Quản lý chọn màu
+- intl: any : Định dạng ngày giờ (Để any sẽ tự chọn phiên bản tương thích nhất)
