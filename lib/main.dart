@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_app/ui/category/create_or_edit_category.dart';
+import 'package:todo_list_app/ui/login/login_page.dart';
 import 'package:todo_list_app/ui/main/main_page.dart';
 import 'package:todo_list_app/ui/onboarding/onboarding_page_view.dart';
 import 'package:todo_list_app/ui/ui.splash/splash.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       locale: context.locale,
       supportedLocales: context.supportedLocales,
-      home: MainPage(),
+      home: const LoginPage(),
     );
   }
 }
