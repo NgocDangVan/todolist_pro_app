@@ -2,8 +2,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_app/ui/register/register_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  var _autoValidateMode = AutovalidateMode.disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -57,19 +65,21 @@ class LoginPage extends StatelessWidget {
 
   Widget _buildFormLogin() {
     return Form(
+        key: _formKey,
+        autovalidateMode: _autoValidateMode,
         child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildUsernameField(),
-          const SizedBox(height: 25),
-          _buildPasswordField(),
-          _buildLoginButton()
-        ],
-      ),
-    ));
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildUsernameField(),
+              const SizedBox(height: 25),
+              _buildPasswordField(),
+              _buildLoginButton()
+            ],
+          ),
+        ));
   }
 
   Column _buildUsernameField() {
@@ -99,6 +109,20 @@ class LoginPage extends StatelessWidget {
                     OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
                 fillColor: Color(0xFF1D1D1D),
                 filled: true),
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return "Email is required";
+              }
+              final bool emailValid = RegExp(
+                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                  .hasMatch(value);
+              if (emailValid) {
+                return null;
+              } else {
+                return "Email không hợp lệ";
+              }
+              return null;
+            },
             style: const TextStyle(
               color: Colors.white,
               fontFamily: "Lato",
@@ -137,6 +161,14 @@ class LoginPage extends StatelessWidget {
                     OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
                 fillColor: Color(0xFF1D1D1D),
                 filled: true),
+            validator: (String? value) {
+              if (value == null || value.isEmpty) {
+                return "Password không để trống";
+              }
+              if (value.length < 6) {
+                return "Password phải từ 6 ký tự trở lên";
+              }
+            },
             style: const TextStyle(
               color: Colors.white,
               fontFamily: "Lato",
@@ -155,7 +187,8 @@ class LoginPage extends StatelessWidget {
       height: 48,
       margin: const EdgeInsets.only(top: 70),
       child: ElevatedButton(
-          onPressed: null, //Muốn disable thì trả về giá trị null
+          onPressed:
+              _onHandlerLoginSubmit, //Muốn disable thì trả về giá trị null
           style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8875FF),
               shape: RoundedRectangleBorder(
@@ -307,5 +340,20 @@ class LoginPage extends StatelessWidget {
   void _goToRegisterPage(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+  }
+
+  void _onHandlerLoginSubmit() {
+    if (_autoValidateMode == AutovalidateMode.disabled) {
+      setState(() {
+        _autoValidateMode = AutovalidateMode.always;
+      });
+    }
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (isValid) {
+      //Call API Loggin, Call Firebase Login
+    } else {
+      // Không làm gì cả
+    }
   }
 }
